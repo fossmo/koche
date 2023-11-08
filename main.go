@@ -60,7 +60,7 @@ func setupGitHook() error {
 
 	var commitContent string
 
-	commitContent = "#!/bin/bashkjj"
+	commitContent = "#!/bin/bash"
 
 	// creates a commit-msg file and adds content
 	// sets correct access rights to files in commit-msg
