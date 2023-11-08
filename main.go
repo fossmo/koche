@@ -104,7 +104,7 @@ func verifyCommitMessage() {
 	// verifies that the commit message follows conventional commits format
 	if !conventionalCommitRegex.MatchString(commitMessage) {
 		fmt.Println("\nInvalid commit-message. The commit message needs to follow this format:\n\n    <type>[optional scope]: <description>\n\n    [optional body]\n\n    [optional footer(s)]\n\n")
-		fmt.Println("Valid types: feat, fix, docs, style, refactor, pref, test, chore\n")
+		fmt.Println("Valid types: feat, fix, docs, style, refactor, perf, test, chore\n")
 		os.Exit(1)
 	}
 }
