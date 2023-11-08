@@ -82,7 +82,14 @@ func verifyCommitMessage() {
 		fmt.Println("Could not open ./git/COMMIT_EDITMSG file:", err)
 		os.Exit(1)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		errFile := file.Close()
+		if errFile != nil {
+			fmt.Println("Could not close ./git/COMMIT_EDITMSG file:", err)
+			fmt.Println("If this problem continues, remove the commit-msg hook and run koche -i again.")
+			os.Exit(1)
+		}
+	}(file)
 
 	// reads the commit message from file
 	scanner := bufio.NewScanner(file)
