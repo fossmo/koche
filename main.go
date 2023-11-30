@@ -95,14 +95,15 @@ func removeGitHook() error {
 	}
 
 	// check if pre-commit file exists in .git/hooks/ folder
-	if checkFileExists(".git/hooks/commit-msg") {
-		return errors.New("pre-commit file exists")
+	if !checkFileExists(".git/hooks/commit-msg") {
+		return errors.New("pre-commit file doesn't exists")
 	}
 
 	// deletes commit-msg hook
 	err := os.Remove(".git/hooks/commit-msg")
 
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 
