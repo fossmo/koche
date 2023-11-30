@@ -10,14 +10,16 @@ import (
 )
 
 var (
-	printVersion bool
-	initgit      bool
-	version      string
+	printVersion                  bool
+	initializeConventionalCommits bool
+	removeConventionalCommits     bool
+	version                       string
 )
 
 func init() {
-	flag.BoolVar(&printVersion, "v", false, "Print version number")
-	flag.BoolVar(&initgit, "i", false, "Sets up git repository with pre-commit hook")
+	flag.BoolVar(&printVersion, "v", false, "Prints version number")
+	flag.BoolVar(&initializeConventionalCommits, "i", false, "Sets up git with conventional commits.")
+	flag.BoolVar(&removeConventionalCommits, "r", false, "Removes conventional commit validation")
 }
 
 func main() {
@@ -33,11 +35,20 @@ func run() {
 		return
 	}
 
-	if initgit {
-		fmt.Println("adding git commit-msg hook")
+	if initializeConventionalCommits {
+		fmt.Println("Added conventional commits to Git repository")
 		err := setupGitHook()
 		if err != nil {
-			fmt.Println("Failed to create commit-cmd hook")
+			fmt.Println("Failed to add conventional commits to Git repository")
+		}
+		return
+	}
+
+	if removeConventionalCommits {
+		fmt.Println("Removed conventional commits from Git repository")
+		err := removeGitHook()
+		if err != nil {
+			fmt.Println("Failed to remove conventional commits from Git repository")
 		}
 		return
 	}
@@ -76,7 +87,36 @@ func setupGitHook() error {
 	return nil
 }
 
+func removeGitHook() error {
+
+	// check if .git folder exists, to verify that it's a git repo
+	if !checkFileExists(".git") {
+		return errors.New("can not find .git folder")
+	}
+
+	// check if pre-commit file exists in .git/hooks/ folder
+	if checkFileExists(".git/hooks/commit-msg") {
+		return errors.New("pre-commit file exists")
+	}
+
+	err := os.Remove(".git/hooks/commit-msg")
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func verifyCommitMessage() {
+
+	// Verifies that there is only one parameter
+	if len(os.Args) != 2 {
+		fmt.Println("This command must be run from within a Git commit hook directory\nTo setup Koche, run 'koche -i' in a Git repository")
+		return
+	}
+
+	// Opening the commit_editmsg file
 	file, err := os.Open(os.Args[1])
 	if err != nil {
 		fmt.Println("Could not open ./git/COMMIT_EDITMSG file:", err)
